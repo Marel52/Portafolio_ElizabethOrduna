@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elizabeth's Portfolio</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.32/build/spline-viewer.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,14 +16,19 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #FCFAEE;
             height: 100vh;
             overflow: hidden;
+            background-color: #FCFAEE;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
             display: flex;
             height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
         .terminal {
@@ -32,7 +38,9 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: 100vh;
+            z-index: 10;
+            margin: 0;
         }
 
         .terminal-header {
@@ -46,8 +54,8 @@
             overflow-y: auto;
             margin-bottom: 20px;
             font-family: 'Courier Prime', monospace;
-            font-size: 16px;
-            line-height: 1.4;
+            font-size: 18px;
+            line-height: 1.5;
         }
 
         .terminal-output::-webkit-scrollbar {
@@ -75,12 +83,12 @@
             border: none;
             border-radius: 4px;
             font-family: 'Courier Prime', monospace;
-            font-size: 16px;
+            font-size: 18px;
             outline: none;
         }
 
         .command-line {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             word-wrap: break-word;
             color: #FCFAEE;
         }
@@ -89,31 +97,129 @@
             color: #ff9999;
         }
 
+        .system-text {
+            font-weight: bold;
+        }
+
         .content-area {
             width: 77%;
             position: relative;
-            padding: 20px;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
 
-        .project-view, .about-view {
-            padding: 40px;
+        /* Project View Styles */
+        .project-view {
             display: none;
-            position: relative;
-            z-index: 2;
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+            margin: 0;
         }
 
-        .project-view h2, .about-view h2 {
-            font-size: 54px;
+        .project-container {
+            display: flex;
+            gap: 20px;
+            height: 100%;
+            margin: 0;
+        }
+
+        .project-content {
+            flex: 2;
+            max-width: 70%;
+        }
+
+        .project-avatar {
+            flex: 1;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 40px);
+            transform: translateX(10%);
+            scale: 1.1;
+        }
+
+        .project-avatar spline-viewer {
+            width: 110%;
+            height: 100%;
+            margin-left: -5%;
+        }
+
+        /* About View Styles */
+        .about-view {
+            display: none;
+            height: 100vh;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .about-container {
+            display: flex;
+            height: 100%;
+            gap: 40px;
+            margin: 0;
+        }
+
+        .about-content {
+            flex: 1;
+            max-width: 60%;
+        }
+
+        .about-avatar {
+            flex: 1;
+            position: relative;
+            height: calc(100vh - 80px);
+        }
+
+        .about-avatar spline-viewer {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        /* Shared Styles */
+        h2 {
+            font-size: 48px;
             color: #B8001F;
             margin-bottom: 24px;
             font-weight: 600;
         }
 
-        .project-view p, .about-view p {
-            font-size: 20px;
-            margin-bottom: 24px;
+        .content-wrapper {
+            background-color: rgba(252, 250, 238, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .content-wrapper p {
+            font-size: 16px;
             line-height: 1.6;
+            color: #333;
+        }
+
+        /* Updated Project Media Styles */
+        .project-media {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-media img, 
+        .project-media video {
+            width: 100%;
+            height: auto;
+            min-height: 500px;
+            max-height: 1000px;
+            object-fit: contain;
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         .linkedin-button {
@@ -126,6 +232,7 @@
             transition: opacity 0.3s;
             font-weight: 500;
             font-size: 20px;
+            margin-top: 20px;
         }
 
         .linkedin-button:hover {
@@ -134,43 +241,19 @@
 
         .spline-container {
             width: 100%;
-            height: 100%;
-        }
-
-        .avatar-container {
+            height: 100vh;
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 300px;
-            height: 300px;
+            top: 0;
+            left: 0;
             z-index: 1;
-            pointer-events: none;
             display: none;
-            transform: scale(0.8);
+            margin: 0;
+            padding: 0;
         }
 
-        .content-wrapper {
-            position: relative;
-            z-index: 2;
-            background-color: rgba(252, 250, 238, 0.9);
-            padding: 30px;
-            border-radius: 8px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .project-media {
-            margin-top: 20px;
-            max-width: 100%;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .project-media img, 
-        .project-media video {
+        #splineContainer spline-viewer {
             width: 100%;
-            max-height: 500px;
-            object-fit: contain;
+            height: 100%;
         }
     </style>
 </head>
@@ -180,72 +263,75 @@
             <div class="terminal-header">ELIZABETH'S PORTFOLIO</div>
             <div class="terminal-output" id="terminalOutput"></div>
             <div class="terminal-input-container">
-                <input type="text" class="terminal-input" id="terminalInput" placeholder="Write help..." autofocus>
+                <input type="text" class="terminal-input" id="terminalInput" placeholder="Type help..." autofocus>
             </div>
         </div>
 
         <div class="content-area">
-            <div class="spline-container" id="splineContainer">
+            <!-- Home View -->
+            <div id="splineContainer" class="spline-container">
                 <spline-viewer url="https://prod.spline.design/4uRgsk0k7w3xE3aA/scene.splinecode"></spline-viewer>
             </div>
 
+            <!-- Project View -->
             <div class="project-view" id="projectView">
-                <div class="content-wrapper">
-                    <h2 id="projectTitle"></h2>
-                    <p id="projectDescription"></p>
-                    <div id="projectMedia"></div>
+                <div class="project-container">
+                    <div class="project-content">
+                        <h2 id="projectTitle"></h2>
+                        <div class="content-wrapper">
+                            <p id="projectDescription"></p>
+                            <div id="projectMedia"></div>
+                        </div>
+                    </div>
+                    <div class="project-avatar">
+                        <spline-viewer url="https://prod.spline.design/yd7badX8rTuuJ01e/scene.splinecode"></spline-viewer>
+                    </div>
                 </div>
             </div>
 
+            <!-- About View -->
             <div class="about-view" id="aboutView">
-                <div class="content-wrapper">
-                    <h2>About me</h2>
-                    <p>Hi, I’m Maria Elizabeth Orduña Toledo, a Software Engineering student passionate about solving problems and building impactful solutions. I'm working on Python, C++, and full-stack development, with experience in projects like edge detection, simulations, and python- base video games. 
-                      I love exploring new technologies and applying my skills to real-world challenges. Feel free to check out my projects —I’m always excited to connect and collaborate!</p>
-                    <a href="www.linkedin.com/in/elizabeth-orduña" target="_blank" class="linkedin-button">LinkedIn</a>
+                <div class="about-container">
+                    <div class="about-content">
+                        <h2>About me</h2>
+                        <div class="content-wrapper">
+                            <p>Hi, I'm Maria Elizabeth Orduña Toledo, a Software Engineering student passionate about solving problems and building impactful solutions. I'm working on Python, C++, and full-stack development, with experience in projects like edge detection, simulations, and python-based video games. 
+                              I love exploring new technologies and applying my skills to real-world challenges. Feel free to check out my projects —I'm always excited to connect and collaborate!</p>
+                            <a href="https://www.linkedin.com/in/elizabeth-orduña" target="_blank" class="linkedin-button">LinkedIn</a>
+                        </div>
+                    </div>
+                    <div class="about-avatar">
+                        <spline-viewer url="https://prod.spline.design/yd7badX8rTuuJ01e/scene.splinecode"></spline-viewer>
+                    </div>
                 </div>
-            </div>
-
-            <div class="avatar-container" id="avatarContainer">
-                <spline-viewer url="https://prod.spline.design/yd7badX8rTuuJ01e/scene.splinecode"></spline-viewer>
             </div>
         </div>
     </div>
 
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.32/build/spline-viewer.js"></script>
     <script>
-        /* INSTRUCCIONES PARA AÑADIR ARCHIVOS MULTIMEDIA:
-         * 1. Crea una carpeta llamada 'assets' en el mismo directorio que este archivo HTML
-         * 2. Coloca tus archivos multimedia (GIFs, videos, imágenes) dentro de la carpeta 'assets'
-         * 3. En el objeto 'projects' below, actualiza las rutas 'path' para que coincidan con tus archivos
-         * 4. Para cada proyecto, especifica el tipo de medio ('image' o 'video')
-         * 5. Formatos soportados:
-         *    - Imágenes: .gif, .jpg, .png, .webp
-         *    - Videos: .mp4 (recomendado), .webm
-         */
         const projects = {
             project1: {
-                title: "Proyecto 1",
-                description: "Descripción detallada del proyecto 1. Explica aquí los aspectos más importantes del proyecto.",
+                title: "STREAMING SERVICE MODEL",
+                description: "● An object-oriented system in C++ to manage video streaming content, including movies and series. Utilized inheritance and polymorphism to create a flexible class structure for videos, implementing method overloading to calculate average ratings.",
                 media: {
                     type: "image",
-                    path: "./assets/project1.gif" // Actualiza esta ruta a tu archivo
+                    path: "./assets/project1.gif"
                 }
             },
             project2: {
-                title: "Proyecto 2",
-                description: "Descripción detallada del proyecto 2. Explica aquí los aspectos más importantes del proyecto.",
+                title: "EDGE DETECTOR",
+                description: "● A system to detect sign language gestures using Python and image processing techniques. Conducted a comparative analysis of edge detection algorithms",
                 media: {
-                    type: "video",
-                    path: "./assets/project2.mp4" // Actualiza esta ruta a tu archivo
+                    type: "image",
+                    path: "./assets/project2.gif"
                 }
             },
             project3: {
-                title: "Proyecto 3",
-                description: "Descripción detallada del proyecto 3. Explica aquí los aspectos más importantes del proyecto.",
+                title: "MAGNETIC BRAKING SIMULATOR IN MECHANICAL GAME",
+                description: "● A computational simulation of magnetic braking in a drop tower ride using MATLAB. Modeled Eddy currents to calculate and visualize the gondola's deceleration, generating speed and acceleration graphs as functions of height. ",
                 media: {
                     type: "image",
-                    path: "./assets/project3.gif" // Actualiza esta ruta a tu archivo
+                    path: "./assets/project3.gif"
                 }
             },
             project4: {
@@ -253,7 +339,7 @@
                 description: "● Designed and implemented a Python-based video game for children aimed at enhancing cognitive skills such as memory and coordination. Integrated interactive challenges",
                 media: {
                     type: "image",
-                    path: "./assets/project4.gif" // Actualiza esta ruta a tu archivo
+                    path: "./assets/project4.gif"
                 }
             }
         };
@@ -266,7 +352,6 @@
         const projectTitle = document.getElementById('projectTitle');
         const projectDescription = document.getElementById('projectDescription');
         const projectMedia = document.getElementById('projectMedia');
-        const avatarContainer = document.getElementById('avatarContainer');
 
         function addToHistory(text, type = 'user') {
             const line = document.createElement('div');
@@ -280,7 +365,6 @@
             splineContainer.style.display = 'none';
             projectView.style.display = 'none';
             aboutView.style.display = 'none';
-            avatarContainer.style.display = 'none';
 
             switch(view) {
                 case 'home':
@@ -288,31 +372,29 @@
                     break;
                 case 'project':
                     projectView.style.display = 'block';
-                    avatarContainer.style.display = 'block';
                     break;
                 case 'about':
                     aboutView.style.display = 'block';
-                    avatarContainer.style.display = 'block';
                     break;
             }
         }
 
         const commands = {
             help: () => {
-                addToHistory('Comandos disponibles:', 'system');
-                addToHistory('- help: Muestra esta lista de comandos');
-                addToHistory('- home: Regresa al inicio');
-                addToHistory('- ls: Lista todos los proyectos');
-                addToHistory('- show [nombre_proyecto]: Muestra el proyecto especificado');
-                addToHistory('- about: Muestra información sobre mí');
-                addToHistory('- clear: Limpia la terminal');
+                addToHistory('Available commands:', 'system');
+                addToHistory('- help: Show this list of commands');
+                addToHistory('- home: Return to home');
+                addToHistory('- ls: List all projects');
+                addToHistory('- show [project_num]: Display specified project');
+                addToHistory('- about me: Show information about me');
+                addToHistory('- clear: Clear terminal');
             },
             home: () => {
                 setView('home');
-                addToHistory('Regresando al inicio');
+                addToHistory('Returning to home');
             },
             ls: () => {
-                addToHistory('Proyectos disponibles:', 'system');
+                addToHistory('Available projects:', 'system');
                 Object.keys(projects).forEach(key => {
                     addToHistory(`- ${key}: ${projects[key].title}`);
                 });
@@ -330,7 +412,7 @@
                             mediaHTML = `
                                 <video controls autoplay loop muted class="project-media">
                                     <source src="${project.media.path}" type="video/mp4">
-                                    Tu navegador no soporta el tag de video.
+                                    Your browser doesn't support video tags.
                                 </video>
                             `;
                         } else {
@@ -343,14 +425,14 @@
                         projectMedia.innerHTML = '';
                     }
                     
-                    addToHistory(`Mostrando ${project.title}`);
+                    addToHistory(`Showing ${project.title}`);
                 } else {
-                    addToHistory('Proyecto no encontrado. Escribe "help" para ver los comandos disponibles.', 'error');
+                    addToHistory('Project not found. Type "help" to see available commands.', 'error');
                 }
             },
             about: () => {
                 setView('about');
-                addToHistory('Mostrando información personal');
+                addToHistory('Showing personal information');
             },
             clear: () => {
                 terminalOutput.innerHTML = '';
@@ -367,7 +449,7 @@
                 if (commands[command]) {
                     commands[command](...args);
                 } else {
-                    addToHistory('Comando no reconocido. Escribe "help" para ver los comandos disponibles.', 'error');
+                    addToHistory('Command not recognized. Type "help" to see available commands.', 'error');
                 }
 
                 e.target.value = '';
@@ -378,6 +460,7 @@
             terminalInput.focus();
         });
 
+        // Initialize home view
         setView('home');
     </script>
 </body>
